@@ -14,7 +14,6 @@ while True:
 
     
     gray =cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray_To_Gaussian= cv2.GaussianBlur(gray,(21,21),0)
 
 
     if reference_Frame is None:
@@ -28,7 +27,7 @@ while True:
     (_,borders,_) = cv2.findContours(threshold_Difference.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for contour in borders:
-        if cv2.contourArea(contour) <5000:
+        if cv2.contourArea(contour) > 3000 and cv2.contourArea(contour) < 5000:
             continue
 
         (x,y,w,h)=cv2.boundingRect(contour)
