@@ -1,16 +1,45 @@
 import copy
-
-
 import cv2;
 import numpy as np;
+import random
 
+##Frame resolution is 640(w)*480(h)
 reference_Frame = None
+activeSquareNr = 0
+cap = cv2.VideoCapture(0)
 
-cap= cv2.VideoCapture(0)
+class SquareScale:
+
+    def __init__(self, x, y, s, c):
+
+        self.x = x
+        self.y = y
+        self.s = s
+        self.c = c
+
+    def scalingRect(self, frame):
+
+        if self.s < width/6:
+            global activeSquareNr
+            activeSquareNr = 1
+            self.s += 1
+            cv2.rectangle(frame, (self.x-self.s, self.y-self.s), (self.x + self.s, self.y + self.s), self.c)
+        else:
+            self.s = 0
+# def spawnNewRect():
+rand = [1/6, 3/6, 5/6]
+raW = random.choice(rand)
+raH = random.choice(rand)
+
+check, frame = cap.read()
+height, width = frame.shape[:2]
+
+myRect = SquareScale(int(width*raW), int(height*raH), 0, (0, 255, 255, 0.5))
+
 
 while True: 
     
-    check, frame= cap.read()
+    check, frame = cap.read()
 
     cv2.line(frame, (0, 0), (int(frame.shape[1]), 0), (255, 255, 255), 1)
     cv2.line(frame, (0, frame.shape[0]), (0, 0), (255, 255, 255), 1)
@@ -21,7 +50,7 @@ while True:
     cv2.line(frame, (0,int(frame.shape[0] * 0.33)), (frame.shape[1], int(frame.shape[0] * 0.33)), (255, 255, 255), 1)
     cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
 
-    gray =cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
     if reference_Frame is None:
@@ -41,15 +70,18 @@ while True:
         (x,y,w,h)=cv2.boundingRect(contour)
         cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 3)
 
+    print(activeSquareNr)
+    if activeSquareNr < 3:
+        activeSquareNr += 1
+        if activeSquareNr == 1:
+            myRect.scalingRect(frame)
 
-       
+        activeSquareNr = 2
 
+        if activeSquareNr == 2:
+            myRect.scalingRect(frame)
 
     cv2.imshow("frame",frame)
-    
-
-    
-  
 
     if cv2.waitKey(1) & 0xFF == ord("w"):
         break
