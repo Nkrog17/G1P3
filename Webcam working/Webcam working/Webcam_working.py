@@ -12,7 +12,15 @@ while True:
     
     check, frame= cap.read()
 
-    
+    cv2.line(frame, (0, 0), (int(frame.shape[1]), 0), (255, 255, 255), 1)
+    cv2.line(frame, (0, frame.shape[0]), (0, 0), (255, 255, 255), 1)
+    cv2.line(frame, (0,frame.shape[0] ), (frame.shape[1], frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (frame.shape[1], frame.shape[0]), (frame.shape[1], 0), (255, 255, 255), 1)
+    cv2.line(frame, (int(frame.shape[1]*0.33), 0), (int(frame.shape[1]*0.33), frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (int(frame.shape[1] * 0.66), 0), (int(frame.shape[1] * 0.66), frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (0,int(frame.shape[0] * 0.33)), (frame.shape[1], int(frame.shape[0] * 0.33)), (255, 255, 255), 1)
+    cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
+
     gray =cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
