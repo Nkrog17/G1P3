@@ -23,10 +23,24 @@ class SquareScale:
             global activeSquareNr
             activeSquareNr = 1
             self.s += 1
-            cv2.rectangle(frame, (self.x-self.s, self.y-self.s), (self.x + self.s, self.y + self.s), self.c)
+            cv2.rectangle(frame, (self.x-self.s, self.y-self.s), (self.x + self.s, self.y + self.s), self.c, 5)
         else:
             self.s = 0
-# def spawnNewRect():
+            self.get_random_pos()
+            
+            
+    def get_random_pos(self):
+        rand = [1/6, 3/6, 5/6]
+        raW = random.choice(rand)
+        raH = random.choice(rand)
+
+        check, frame = cap.read()
+        height, width = frame.shape[:2]
+
+        self.x = int(width*raW)
+        self.y = int(height*raH)
+    
+#Ryd op her
 rand = [1/6, 3/6, 5/6]
 raW = random.choice(rand)
 raH = random.choice(rand)
@@ -41,15 +55,6 @@ while True:
     
     check, frame = cap.read()
 
-    cv2.line(frame, (0, 0), (int(frame.shape[1]), 0), (255, 255, 255), 1)
-    cv2.line(frame, (0, frame.shape[0]), (0, 0), (255, 255, 255), 1)
-    cv2.line(frame, (0,frame.shape[0] ), (frame.shape[1], frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (frame.shape[1], frame.shape[0]), (frame.shape[1], 0), (255, 255, 255), 1)
-    cv2.line(frame, (int(frame.shape[1]*0.33), 0), (int(frame.shape[1]*0.33), frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (int(frame.shape[1] * 0.66), 0), (int(frame.shape[1] * 0.66), frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (0,int(frame.shape[0] * 0.33)), (frame.shape[1], int(frame.shape[0] * 0.33)), (255, 255, 255), 1)
-    cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
-
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
@@ -58,19 +63,18 @@ while True:
         continue 
 
     frame_Difference = cv2.absdiff(reference_Frame, gray)
-    threshold_Difference= cv2.threshold(frame_Difference,30,255,cv2.THRESH_BINARY)[1]
+    threshold_Difference= cv2.threshold(frame_Difference,100,255,cv2.THRESH_BINARY)[1]
     threshold_Difference= cv2.dilate(threshold_Difference,None, iterations=0)
 
     (_,borders,_) = cv2.findContours(threshold_Difference.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for contour in borders:
-        if cv2.contourArea(contour) > 3000 and cv2.contourArea(contour) < 5000:
+        if cv2.contourArea(contour) > 2000 and cv2.contourArea(contour) < 3000:
             continue
 
         (x,y,w,h)=cv2.boundingRect(contour)
         cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 3)
 
-    print(activeSquareNr)
     if activeSquareNr < 3:
         activeSquareNr += 1
         if activeSquareNr == 1:
@@ -81,10 +85,20 @@ while True:
         if activeSquareNr == 2:
             myRect.scalingRect(frame)
 
+    cv2.line(frame, (0, 0), (int(frame.shape[1]), 0), (255, 255, 255), 1)
+    cv2.line(frame, (0, frame.shape[0]), (0, 0), (255, 255, 255), 1)
+    cv2.line(frame, (0,frame.shape[0] ), (frame.shape[1], frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (frame.shape[1], frame.shape[0]), (frame.shape[1], 0), (255, 255, 255), 1)
+    cv2.line(frame, (int(frame.shape[1]*0.33), 0), (int(frame.shape[1]*0.33), frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (int(frame.shape[1] * 0.66), 0), (int(frame.shape[1] * 0.66), frame.shape[0]), (255, 255, 255), 1)
+    cv2.line(frame, (0,int(frame.shape[0] * 0.33)), (frame.shape[1], int(frame.shape[0] * 0.33)), (255, 255, 255), 1)
+    cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
+
     cv2.imshow("frame",frame)
 
     if cv2.waitKey(1) & 0xFF == ord("w"):
         break
+
 
 cv2.destroyAllWindows()
 
