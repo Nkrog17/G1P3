@@ -12,16 +12,26 @@ class Controller:
 
     def main_loop(self):
         global activeSquareNr
+        testing = 0
         while True: #Ryk så meget kode ud i funktioner som muligt, så vores mail loop ikke er for langt.
             
             check, frame = self.cap.read()
+            frame = cv2.flip(frame, flipCode=1)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             if self.reference_Frame is None:
                 self.reference_Frame = gray
+            elif testing >= 6:
+                self.reference_Frame = gray
+
+       #     if testing >= 6:
+       #         testing = 0
+       #     else:
+       #         testing += 1
+                
 
             frame_Difference = cv2.absdiff(self.reference_Frame, gray)
-            threshold_Difference= cv2.threshold(frame_Difference,100,255,cv2.THRESH_BINARY)[1]
+            threshold_Difference= cv2.threshold(frame_Difference,50,255,cv2.THRESH_BINARY)[1]
             threshold_Difference= cv2.dilate(threshold_Difference,None, iterations=0)
 
             (_,borders,_) = cv2.findContours(threshold_Difference.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -55,6 +65,7 @@ class Controller:
             cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
 
             cv2.imshow("frame",frame)
+            print(frame.shape)
 
             if cv2.waitKey(1) & 0xFF == ord("w"):
                 break
