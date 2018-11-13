@@ -10,22 +10,25 @@ cap = cv2.VideoCapture(0)
 
 class SquareScale:
 
-    def __init__(self, x, y, s, c):
+    def __init__(self, x, y, s, b, c):
 
         self.x = x
         self.y = y
         self.s = s
+        self.b = b
         self.c = c
 
     def scalingRect(self, frame):
 
-        if self.s < width/6:
+        if self.s < width/6 and self.b < height/6:
             global activeSquareNr
             activeSquareNr = 1
-            self.s += 1
-            cv2.rectangle(frame, (self.x-self.s, self.y-self.s), (self.x + self.s, self.y + self.s), self.c, 5)
+            self.s += width * 0.001
+            self.b += height * 0.001
+            cv2.rectangle(frame, (int(self.x-self.s), int(self.y-self.b)), (int(self.x + self.s), int(self.y + self.b)), self.c)
         else:
             self.s = 0
+            self.b = 0
             self.get_random_pos()
             
             
@@ -48,7 +51,7 @@ raH = random.choice(rand)
 check, frame = cap.read()
 height, width = frame.shape[:2]
 
-myRect = SquareScale(int(width*raW), int(height*raH), 0, (0, 255, 255, 0.5))
+myRect = SquareScale(int(width*raW), int(height*raH), 0, 0,(0, 255, 255, 0.5))
 
 
 while True: 
@@ -84,15 +87,27 @@ while True:
 
         if activeSquareNr == 2:
             myRect.scalingRect(frame)
+    #Koden for at tegne et grid
+    step_count = 3
+    height = frame.shape[0]
+    width =  frame.shape[1]
+    lt = 1 # line thickness
+    gridColor = (255,255,255)
+    y_start = 0
+    y_end = height
+    step_sizey = int(width / step_count)
+    step_sizex = int(height / step_count)
 
-    cv2.line(frame, (0, 0), (int(frame.shape[1]), 0), (255, 255, 255), 1)
-    cv2.line(frame, (0, frame.shape[0]), (0, 0), (255, 255, 255), 1)
-    cv2.line(frame, (0,frame.shape[0] ), (frame.shape[1], frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (frame.shape[1], frame.shape[0]), (frame.shape[1], 0), (255, 255, 255), 1)
-    cv2.line(frame, (int(frame.shape[1]*0.33), 0), (int(frame.shape[1]*0.33), frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (int(frame.shape[1] * 0.66), 0), (int(frame.shape[1] * 0.66), frame.shape[0]), (255, 255, 255), 1)
-    cv2.line(frame, (0,int(frame.shape[0] * 0.33)), (frame.shape[1], int(frame.shape[0] * 0.33)), (255, 255, 255), 1)
-    cv2.line(frame, (0, int(frame.shape[0] * 0.66)), (frame.shape[1], int(frame.shape[0] * 0.66)), (255, 255, 255), 1)
+    for x in range(0, width, step_sizey ):
+        #line = ((x, y_start), (x, y_end))
+        cv2.line(frame,(x,y_start), (x, y_end),gridColor,lt)
+
+        x_start = 0
+        x_end = width
+
+    for y in range(0, height, step_sizex):
+            #line = ((x_start, y), (x_end, y))
+            cv2.line(frame, (x_start, y), (x_end, y), gridColor, lt)
 
     cv2.imshow("frame",frame)
 
