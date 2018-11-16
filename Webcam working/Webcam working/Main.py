@@ -9,6 +9,9 @@ class Main:
         self.tracker = Tracker.Tracker()
         #self.reference_frame = None
 
+        ##Initializes a Rectangle object from the Rect class, with a yellow color.
+        self.rect1 = Rect.Rect((0,255,255), self.cap.read()[1])
+
     def main_loop(self):
         while True:
             cap, frame = self.cap.read()
@@ -16,8 +19,10 @@ class Main:
 
             frame = self.tracker.get_movement(frame)
 
+            
             self.draw(frame)
-
+            
+            
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
@@ -25,6 +30,8 @@ class Main:
     def draw(self, frame):
         frame = self.draw_grid(frame)
 
+        self.rect1.draw(frame) ##Draws the rectangle 1
+        
         cv2.imshow("SuperNiceGame", frame)
 
     def draw_grid(self, frame):
