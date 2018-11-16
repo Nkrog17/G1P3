@@ -3,7 +3,8 @@ import copy
 
 class Tracker:
 
-    def __init__(self):
+    def __init__(self, draw_rects):
+        self.drawing_rects = draw_rects
         self.reference_frame = None
         self.timer = 0
         self.refresh_rate = 6
@@ -29,19 +30,27 @@ class Tracker:
         threshold_difference = cv2.threshold(frame_difference, self.low_thresh, self.high_thresh,cv2.THRESH_BINARY)[1]
         threshold_difference = cv2.dilate(threshold_difference, None, iterations=0)
 
-        final_frame = self.draw_borders(frame, threshold_difference)
+        final_frame = self.track_areas(frame, threshold_difference)
 
+        #final_frame is a list of areas if self.drawing_rects is false.
         return final_frame
 
-    def draw_borders(self, frame, threshold_difference):
+    def track_areas(self, frame, threshold_difference):
         (_,borders,_) = cv2.findContours(threshold_difference.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+        areas = []
+        
         for contour in borders:
             if cv2.contourArea(contour) > 2000 and cv2.contourArea(contour) < 3000:
                 continue
 
             (x,y,w,h) = cv2.boundingRect(contour)
-            cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 3)
+            areas.append((x,y,w,h))
 
-        return frame
+            if self.drawing_rects:
+                cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 3)
+
+        if self.drawing_rects:
+            return frame
+        else:
+            return areas
     

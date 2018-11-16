@@ -6,15 +6,17 @@ class Main:
 
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        self.tracker = Tracker.Tracker()
-        #self.reference_frame = None
+        self.tracker = Tracker.Tracker(False)
 
     def main_loop(self):
         while True:
             cap, frame = self.cap.read()
             frame = cv2.flip(frame, flipCode=1)
 
-            frame = self.tracker.get_movement(frame)
+            if self.tracker.drawing_rects:
+                frame = self.tracker.get_movement(frame)
+            else:
+                areas = self.tracker.get_movement(frame)
 
             self.draw(frame)
 
