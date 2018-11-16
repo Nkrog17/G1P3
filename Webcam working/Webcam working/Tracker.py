@@ -44,9 +44,9 @@ class Tracker:
                 continue
 
             (x,y,w,h) = cv2.boundingRect(contour)
-            areas.append((x,y,w,h))
+            areas.append(((x,y),(x+w,y+h)))
 
-            if self.drawing_rects:
+            if self.drawing_rects:                
                 cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 3)
 
         if self.drawing_rects:
