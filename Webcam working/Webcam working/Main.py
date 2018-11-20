@@ -30,6 +30,8 @@ class Main:
 
     def check_collision(self, frame, areas):
         for rect in self.rects:
+            if rect.timer < rect.wait_time:
+                continue
             if not rect.touched:
                 #Loop through untouched rects on screen
                 p1,p2 = rect.pos1, rect.pos2
