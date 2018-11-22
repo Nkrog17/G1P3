@@ -10,7 +10,7 @@ class Main:
         self.score = 0
 
         ##Initializes a list of Rectangle objects from the Rect class.
-        self.rects = [Rect.Rect(self.cap.read()[1])] 
+        self.rects = [Rect.Rect(self.cap.read()[1]), Rect.Rect(self.cap.read()[1])] 
 
     def main_loop(self):
         while True:
@@ -57,7 +57,9 @@ class Main:
         frame = self.draw_score(frame)
 
         for rect in self.rects:
-            rect.draw(frame) ##Draws the rectangles
+            other_rects = list(self.rects)
+            other_rects.remove(rect)
+            rect.draw(frame, other_rects) ##Draws the rectangles
         
         cv2.imshow("SuperNiceGame", frame)
 

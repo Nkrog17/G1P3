@@ -6,7 +6,7 @@ class Rect:
     def __init__(self, frame):
         self.height = 0 ##Used to store the height of the frame.
         self.width = 0 ##Width of the frame
-        self.rand_pos(frame)
+        self.rand_pos(frame, None)
         self.s = 0 ##The scaling variable used to make the rectangles increase in size.
         self.c = (0,0,0) ##Color of the rectangle.
         self.ratio = 0 ##Will contain the ratio of the width and height (Width divided by Height)
@@ -14,9 +14,12 @@ class Rect:
         self.pos1 = (0,0)
         self.pos2 = (0,0)
         self.touched = False
+        self.dX = 0
+        self.dY = 0
 
         self.timer = 0
-        self.wait_time = 30
+        self.wait_time = 10
+        self.grow_amount = 2
 
     def change_color(self):
         full = self.height/6
@@ -27,7 +30,7 @@ class Rect:
         else:
             self.c = (0,255,0)
         
-    def draw(self, frame): ##Function to draw the rectangles on top of the frame.
+    def draw(self, frame, rects): ##Function to draw the rectangles on top of the frame.
         if not self.touched:
             if self.timer >= self.wait_time:
                 self.ratio = self.width / self.height ##Get the ratio of the frame
@@ -35,7 +38,7 @@ class Rect:
 
                 self.pos1 = (self.x - self.growth, int(self.y-self.s))
                 self.pos2 = (self.x + self.growth, int(self.y + self.s))
-                self.s += 1.2 ##Increases the size of the rectangle
+                self.s += self.grow_amount ##Increases the size of the rectangle
             else:
                 self.pos1 = (self.x-4, self.y-4)
                 self.pos2 = (self.x+4, self.y+4)
@@ -49,21 +52,35 @@ class Rect:
             else:
                 self.s = 0 ##Resets the size modifier
                 self.timer = 0
-                self.rand_pos(frame) ##Chooses new random position for rectangle to spawn
+                self.rand_pos(frame, rects) ##Chooses new random position for rectangle to spawn
         else:
             self.s = 0
             self.timer = 0
-            self.rand_pos(frame)
+            self.rand_pos(frame, rects)
             self.touched = False
 
-    def rand_pos(self, frame):
+    def rand_pos(self, frame, rects):
+        bad_x_positions, bad_y_positions = [], []
+        if rects:
+            bad_x_positions = [x.dX for x in rects]
+            bad_y_positions = [x.dY for x in rects]
         rand = [1/6, 3/6, 5/6] ##An array of values that will decide where the rectangle's start position is.
         raX = random.choice(rand) ##Chooses one random value from the array to be used as X value.
+
+        if raX in bad_x_positions: #Move rect is cell is occupied by another rect
+            if raX == 3/6: #Move away from top middle, if spawning there.
+                raX = random.choice([1/6, 5/6])
+                raY = random.choice(rand)
+            else: #If x positions are the same, get a new y position.
+                new_y_positions = list(rand)
+                del new_y_positions[bad_x_positions.index(raX)]
+                raY = random.choice(new_y_positions)
         if raX == 3/6:
             raY = 1/6
         else:
             raY = random.choice(rand) ##Chooses one random value from the array to be used as Y value
-        
+
+        self.dX, self.dY = raX, raY #Values used to compare rect positions.
         self.height, self.width = frame.shape[:2] ##Acquires the height and width of the frame
 
         self.x = int(self.width*raX) ##The x value the rect will spawn upon
