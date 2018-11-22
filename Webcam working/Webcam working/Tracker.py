@@ -52,6 +52,5 @@ class Tracker:
         if self.drawing_rects:
             return frame
         else:
-            areas = []
             return areas
     

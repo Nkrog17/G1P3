@@ -14,12 +14,19 @@ class Rect:
         self.pos1 = (0,0)
         self.pos2 = (0,0)
         self.touched = False
+        self.allowed_to_grow = True
         self.dX = 0
         self.dY = 0
 
         self.timer = 0
         self.wait_time = 10
-        self.grow_amount = 2
+        self.grow_amount = 1.5
+
+        #variables for showing score points
+        self.point_timer = 50
+        self.score = 0
+        self.point_pos = (0,0)
+        self.point_color = self.c
 
     def change_color(self):
         full = self.height/6
@@ -33,6 +40,7 @@ class Rect:
     def draw(self, frame, rects): ##Function to draw the rectangles on top of the frame.
         if not self.touched:
             if self.timer >= self.wait_time:
+                self.point_timer = 50
                 self.ratio = self.width / self.height ##Get the ratio of the frame
                 self.growth = round(self.s * self.ratio) ##Used for the width to increase the same amount as the height percentage-wise
 
@@ -42,7 +50,8 @@ class Rect:
             else:
                 self.pos1 = (self.x-4, self.y-4)
                 self.pos2 = (self.x+4, self.y+4)
-                self.timer += 1
+                if self.allowed_to_grow:
+                    self.timer += 1
 
             self.change_color()
 
@@ -52,6 +61,7 @@ class Rect:
             else:
                 self.s = 0 ##Resets the size modifier
                 self.timer = 0
+                self.allowed_to_grow = False
                 self.rand_pos(frame, rects) ##Chooses new random position for rectangle to spawn
         else:
             self.s = 0

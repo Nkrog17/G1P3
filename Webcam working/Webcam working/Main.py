@@ -40,23 +40,44 @@ class Main:
                     p3, p4 = area[0], area[1]
                     #Check if the areas intersect with the rect and give points.
                     if not (p2[1] < p3[1] or p1[1] > p4[1] or p2[0] < p3[0] or p1[0] > p4[0]):
-                        self.award_points(rect)
+                        self.award_points(rect, frame)
 
-    def award_points(self, rect): #Points go amok sometimes...
+    def award_points(self, rect, frame):
         if not rect.touched:
             if rect.c == (0,0,255):
-                self.score -= 1
+                score = -1
             elif rect.c == (0,255,255):
-                self.score += 1
+                score = 1
             else:
-                self.score += 2
+                score = 2
+            rect.score = score
+            rect.point_timer = 0
+            rect.point_pos = (int(frame.shape[1]*rect.dX-20),int(frame.shape[0]*rect.dY+10))
+            rect.point_color = rect.c
+            self.score += score
             rect.touched = True
+            rect.allowed_to_grow = False
+
+    def draw_points(self, frame, rect):
+        if rect.point_timer < 40:
+            cv2.putText(frame, str(rect.score), rect.point_pos,
+                        cv2.FONT_HERSHEY_TRIPLEX, 2, rect.point_color)
+            rect.point_timer += 1
+
+    def sync_rects(self):
+        allowed = [x.allowed_to_grow for x in self.rects]
+        if True not in allowed:
+            for rect in self.rects:
+                rect.allowed_to_grow = True
 
     def draw(self, frame):
         frame = self.draw_grid(frame)
         frame = self.draw_score(frame)
 
+        self.sync_rects()
+
         for rect in self.rects:
+            self.draw_points(frame, rect)
             other_rects = list(self.rects)
             other_rects.remove(rect)
             rect.draw(frame, other_rects) ##Draws the rectangles
