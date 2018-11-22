@@ -1,12 +1,19 @@
 import cv2
 import Rect
 import Tracker
+import ColourTrack
 
 class Main:
 
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
+
+        ##Tracker for pixel change
         self.tracker = Tracker.Tracker(False)
+
+        ##Tracker for ColorTracking
+        ##self.tracker = ColourTrack.ColorTracker(False, 60)
+        
         self.score = 0
 
         ##Initializes a list of Rectangle objects from the Rect class.
