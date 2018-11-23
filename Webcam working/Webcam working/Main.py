@@ -10,10 +10,12 @@ class Main:
         self.score = 0
 
         ##Initializes a list of Rectangle objects from the Rect class.
-        self.rects = [Rect.Rect(self.cap.read()[1]), Rect.Rect(self.cap.read()[1])] 
+        self.rects = [Rect.Rect(self.cap.read()[1]), Rect.Rect(self.cap.read()[1])]
+
+        self.play_time = 0
 
     def main_loop(self):
-        while True:
+        while self.play_time < 40:
             cap, frame = self.cap.read()
             frame = cv2.flip(frame, flipCode=1)
 
@@ -57,6 +59,7 @@ class Main:
             self.score += score
             rect.touched = True
             rect.allowed_to_grow = False
+            self.play_time += 1
 
     def draw_points(self, frame, rect):
         if rect.point_timer < 40:
