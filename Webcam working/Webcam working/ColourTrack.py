@@ -52,23 +52,22 @@ class ColorTracker:
         ##If there are more than 0 contours find the biggest one and make a green rectangle around it.
         if len(contours) != 0:
 
+            # draw in blue the contours that were found (All of them)
+            cv2.drawContours(mask, contours, -1, 255, 3)
+            
             #find the biggest contour area.
             c = max(contours, key = cv2.contourArea)
+            
             ##Getting the rectangle attributes around the biggest contour (c)
             x,y,w,h = cv2.boundingRect(c)
+            
+            ##Inserts the area with the most of the color (Biggest contour) into the areas array.
+            areas.append(((x,y), (x+w, y+h)))
 
-            if w > self.track_minimum_width: ##Only collects the area with the color if the area's width is over 10.
-                ##Inserts the area with the most of the color (Biggest contour) into the areas array.
-                areas.append(((x,y), (x+w, y+h)))
-
-            ##If drawing_rects is true show all contours
+            ##Only draws the rectangle behind biggest contour if drawing_rects is true.
             if self.drawing_rects:
-                # draw in blue the contours that were found (All of them)
-                cv2.drawContours(frame, contours, -1, 255, 3)
-
-                if w > self_track_minimum_width: ##Only draws rectangle around biggest contour if the contour's width is over 10.
-                    # draw a rectangle around the biggest contour (in green)
-                    cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
+                # draw a rectangle around the biggest contour (in green)
+                cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
 
 
         return areas
