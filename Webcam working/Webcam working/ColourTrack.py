@@ -10,11 +10,11 @@ class ColorTracker:
         self.drawing_rects = draw_rect ##A boolean deciding whether or not the contour will be shown
         self.sensitivity = 30 ##An integer deciding sensitivity (Higher sensitivity means a broader hue value is tracked)
         self.color = trackedColor ##The 3rd input in constructor will decide the color tracked. Should be in int between 0 and 180
-        self.lower_saturation = 50 ##The lower boundary of saturation values tracked
+        self.lower_saturation = 100 ##The lower boundary of saturation values tracked
         self.upper_saturation = 255##The upper boundary of saturations tracked
-        self.lower_value = 50 ##The lower boundary of value tracked
+        self.lower_value = 100 ##The lower boundary of value tracked
         self.upper_value = 255##The upper boundary of value tracked.
-
+        self.track_minimum_width = 10 ##The lowest width of the biggest contour for it to count.
 
     def get_movement(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) ##Converts the image to a HSV image.
@@ -57,16 +57,18 @@ class ColorTracker:
             ##Getting the rectangle attributes around the biggest contour (c)
             x,y,w,h = cv2.boundingRect(c)
 
-            ##Inserts the area with the most of the color (Biggest contour) into the areas array.
-            areas.append(((x,y), (x+w, y+h)))
+            if w > self.track_minimum_width: ##Only collects the area with the color if the area's width is over 10.
+                ##Inserts the area with the most of the color (Biggest contour) into the areas array.
+                areas.append(((x,y), (x+w, y+h)))
 
             ##If drawing_rects is true show all contours
             if self.drawing_rects:
                 # draw in blue the contours that were found (All of them)
                 cv2.drawContours(frame, contours, -1, 255, 3)
 
-                # draw a rectangle around the biggest contour (in green)
-                cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
+                if w > self_track_minimum_width: ##Only draws rectangle around biggest contour if the contour's width is over 10.
+                    # draw a rectangle around the biggest contour (in green)
+                    cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
 
 
         return areas
