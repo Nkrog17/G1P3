@@ -60,15 +60,17 @@ class ColorTracker:
             
             ##Getting the rectangle attributes around the biggest contour (c)
             x,y,w,h = cv2.boundingRect(c)
-            
-            ##Inserts the area with the most of the color (Biggest contour) into the areas array.
-            areas.append(((x,y), (x+w, y+h)))
 
-            ##Only draws the rectangle behind biggest contour if drawing_rects is true.
-            if self.drawing_rects:
-                # draw a rectangle around the biggest contour (in green)
-                cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
+            if w > self.track_minimum_width:
+                ##Inserts the area with the most of the color (Biggest contour) into the areas array.
+                areas.append(((x,y), (x+w, y+h)))
 
+                ##Only draws the rectangle behind biggest contour if drawing_rects is true.
+                if self.drawing_rects:
+                    # draw a rectangle around the biggest contour (in green)
+                    cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
+                    ## Draws all small contours in blue
+                    cv2.drawContours(frame, contours, -1, 255, 3)
 
         return areas
 
