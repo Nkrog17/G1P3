@@ -14,7 +14,7 @@ class ColorTracker:
         self.upper_saturation = 255##The upper boundary of saturations tracked
         self.lower_value = 100 ##The lower boundary of value tracked
         self.upper_value = 255##The upper boundary of value tracked.
-        self.track_minimum_width = 20 ##The lowest width of the biggest contour for it to count.
+        self.track_minimum_width = 10 ##The lowest width of the biggest contour for it to count.
 
     def get_movement(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) ##Converts the image to a HSV image.
@@ -59,13 +59,14 @@ class ColorTracker:
             c = max(contours, key = cv2.contourArea)
             # Sorts the contour list from smallest to biggest contour area.
             contours.sort(key = cv2.contourArea)
-            # Removes the biggest contour from the list
-            contours.pop(len(contours)-1)
 
 
             ##Getting the rectangle attributes around the biggest contour (c)
             x,y,w,h = cv2.boundingRect(c)
-            
+
+            # Removes the biggest contour from the list
+            contours.pop(len(contours)-1)
+
             # Inserts the biggest contour area into area array if it's width is bigger than min value.
             if w > self.track_minimum_width:
                 ##Inserts the area with the most of the color (Biggest contour) into the areas array.
@@ -80,16 +81,16 @@ class ColorTracker:
                 
                 if w2 > self.track_minimum_width:
                     # Adds the contour area to the area array
-                    areas.append(((x2,y2), (x+w, y+h)))
+                    areas.append(((x2,y2), (x2+w2, y2+h2)))
 
 
             ##Only draws the rectangle behind biggest contour if drawing_rects is true.
-            if self.drawing_rects:
+            if self.drawing_rects and len(contours) != 0:
                 # draw a rectangle around the biggest contour (in green)
                 cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
                 ## Draws all small contours in blue
                 cv2.drawContours(frame, contours, -1, 255, 3)
                 #Draw a rectangle around the second biggest contour (in red)
                 cv2.rectangle(frame, (x2,y2), (x2+w2, y2+h2), (0,0,255), 2)
-
+        
         return areas
