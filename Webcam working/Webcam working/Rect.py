@@ -55,7 +55,7 @@ class Rect:
 
             self.change_color()
 
-            if self.s < self.width/6 and self.s < self.height/6: ##If rectangle size is not bigger than the 9th of the frame it should be inside
+            if self.s < self.height/6: ##If rectangle size is not bigger than the 9th of the frame it should be inside
                 ##Draws the rectangle starting on self.x and y coordinates that keeps growing.
                 cv2.rectangle(frame, self.pos1, self.pos2, self.c, 5)
             else:

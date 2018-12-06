@@ -2,6 +2,7 @@ import cv2
 import Rect
 import Tracker
 import ColourTrack
+import FiducialTrack
 
 class Main:
 
@@ -9,10 +10,13 @@ class Main:
         self.cap = cv2.VideoCapture(0)
 
         ##Tracker for pixel change
-        self.tracker = Tracker.Tracker(False)
+        ##self.tracker = Tracker.Tracker(False)
 
         ##Tracker for ColorTracking
         ##self.tracker = ColourTrack.ColorTracker(False, 60)
+
+        ##Tracker for fiducials
+        self.tracker = FiducialTrack.FiducialTrack(True)
         
         self.score = 0
 
@@ -22,7 +26,7 @@ class Main:
         self.play_time = 0
 
     def main_loop(self):
-        while self.play_time < 40:
+        while True:
             cap, frame = self.cap.read()
             frame = cv2.flip(frame, flipCode=1)
 
