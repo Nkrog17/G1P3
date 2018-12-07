@@ -4,13 +4,13 @@ import cv2
 
 class FiducialTrack:
 
-    def __init__(self, draw_matches):
+    def __init__(self, draw_matches, fiducial, color):
         self.drawing_matches = draw_matches
-        self.fiducial = cv2.imread("fid4.png", 0)
+        self.fiducial = cv2.imread(fiducial, 0)
+        self.color = color
 
-        self.matches = 4
-        self.thresh = 50
-        self.dot_width = 50
+        self.matches = 40
+        self.dot_width = 30
 
     def get_movement(self, frame):
         img1 = self.fiducial
@@ -22,11 +22,17 @@ class FiducialTrack:
         kp1, des1 = orb.detectAndCompute(img1,None)
         kp2, des2 = orb.detectAndCompute(img2,None)
 
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        index_params = dict(algorithm = 6,
+                   table_number = 6, # 12
+                   key_size = 12,     # 20
+                   multi_probe_level = 1)
+        search_params = dict(checks=50)   # or pass empty dictionary
+
+        flann = cv2.FlannBasedMatcher(index_params,search_params)
 
         try:
-            matches = bf.match(des1, des2)
-            matches = sorted(matches, key = lambda x : x.distance)
+            matches = flann.knnMatch(des1,des2,k=2)
+            matches = sorted(matches, key = lambda x : x[1].distance)
 
             return self.track_fiducial(frame, matches[:self.matches], kp1, kp2)
         except:
@@ -38,7 +44,7 @@ class FiducialTrack:
 
         #Extract coordinates from matches.
         for mat in matches[:self.matches]:
-            img2_idx = mat.trainIdx
+            img2_idx = mat[1].trainIdx
             (x2, y2) = kp2[img2_idx].pt
             list_kp2.append([x2, y2])
         
@@ -114,24 +120,12 @@ class FiducialTrack:
             ##Inserts the area with the Biggest contour into the areas array.
             areas.append(((x,y), (x+w, y+h)))
 
-            # An if statement in which we find the second biggest contour and add it to area array
-            if len(contours) != 0:
-                # Finding the biggest contour (After biggest has been removed above, so technically 2nd biggest)
-                c2 = max(contours, key = cv2.contourArea)
-                # Finds the values of the rect surrounding it.
-                x2, y2, w2, h2 = cv2.boundingRect(c2)
-                
-                # Adds the contour area to the area array
-                areas.append(((x2,y2), (x2+w2, y2+h2)))
-
 
             if self.drawing_matches and len(contours) != 0:
                 # draw a rectangle around the biggest contour (in green)
-                cv2.rectangle(frame, (x,y), (x+w, y+h),(0,255,0) ,2)
+                cv2.rectangle(frame, (x,y), (x+w, y+h),self.color ,2)
                 ## Draws all small contours in blue
-                cv2.drawContours(frame, contours, -1, (0,0,255) , 3)
-                #Draw a rectangle around the second biggest contour (in red)
-                cv2.rectangle(frame, (x2,y2), (x2+w2, y2+h2), (0,0,255), 2)
+               # cv2.drawContours(frame, contours, -1, (0,0,255) , 3)
 
         #Shows mask
         cv2.imshow("test", mask)

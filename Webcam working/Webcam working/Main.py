@@ -16,8 +16,10 @@ class Main:
         ##self.tracker = ColourTrack.ColorTracker(False, 60)
 
         ##Tracker for fiducials
-        self.tracker = FiducialTrack.FiducialTrack(True)
-        
+        self.tracker = FiducialTrack.FiducialTrack(True, "fid4.png", (0,255,0))
+        self.tracker2 = FiducialTrack.FiducialTrack(True, "fid1.png", (0,0,255))
+
+        self.fiducials_activated = True
         self.score = 0
 
         ##Initializes a list of Rectangle objects from the Rect class.
@@ -30,7 +32,10 @@ class Main:
             cap, frame = self.cap.read()
             frame = cv2.flip(frame, flipCode=1)
 
-            areas = self.tracker.get_movement(frame)
+            if not self.fiducials_activated:
+                areas = self.tracker.get_movement(frame)
+            else:
+                areas = self.fuse_positions(frame)
 
             self.check_collision(frame, areas)
             
@@ -40,6 +45,12 @@ class Main:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
+
+    def fuse_positions(self, frame):
+        areas1 = self.tracker.get_movement(frame)
+        areas2 = self.tracker2.get_movement(frame)
+
+        return areas1 + areas2
 
     def check_collision(self, frame, areas):
         for rect in self.rects:
