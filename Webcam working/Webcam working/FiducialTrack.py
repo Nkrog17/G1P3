@@ -6,10 +6,10 @@ class FiducialTrack:
 
     def __init__(self, draw_matches):
         self.drawing_matches = draw_matches
-        self.fiducial = cv2.imread("fid1.png", 0)
+        self.fiducial = cv2.imread("fid4.png", 0)
 
-        self.matches = 5
-        self.thresh = 150
+        self.matches = 10
+        self.thresh = 50
     
 
     def get_movement(self, frame):
@@ -50,6 +50,7 @@ class FiducialTrack:
 
             temp_kp2 = copy.deepcopy(list_kp2)
 
+
             #Remove vertecies if they are too far away - possibly false positives.
             for vertex in temp_kp2:
                 if vertex[0] > (avg_x + self.thresh) or vertex[0] < (avg_x - self.thresh):
@@ -57,8 +58,6 @@ class FiducialTrack:
                 elif vertex[1] > (avg_y + self.thresh) or vertex[1] < (avg_y - self.thresh):
                     list_kp2.remove(vertex)
                     
-                vertex = tuple((int(vertex[0]), int(vertex[1])))
-                cv2.rectangle(frame, vertex, vertex, (255,0,0), 15)
 
             #Update positions after vertecies are removed.
             if list_kp2:
@@ -68,6 +67,13 @@ class FiducialTrack:
 
                 if self.drawing_matches:
                     cv2.rectangle(frame, pos[0], pos[1], (0,255,0), 3)
+
+                    for vertex in list_kp2:
+                        vertex = tuple((int(vertex[0]), int(vertex[1])))
+                        cv2.rectangle(frame, vertex, vertex, (255,0,0), 50)
+                        
+                    mask = cv2.inRange(frame, (255,0,0), (255,0,0))
+                    cv2.imshow("test", mask)
 
                 return [pos]
             else:
