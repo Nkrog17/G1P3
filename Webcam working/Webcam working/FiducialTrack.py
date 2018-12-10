@@ -23,10 +23,10 @@ class FiducialTrack:
         kp2, des2 = orb.detectAndCompute(img2,None)
 
         index_params = dict(algorithm = 6,
-                   table_number = 6, # 12
-                   key_size = 12,     # 20
+                   table_number = 6,
+                   key_size = 12,
                    multi_probe_level = 1)
-        search_params = dict(checks=50)   # or pass empty dictionary
+        search_params = dict(checks=50)
 
         flann = cv2.FlannBasedMatcher(index_params,search_params)
 
@@ -47,24 +47,7 @@ class FiducialTrack:
             img2_idx = mat[1].trainIdx
             (x2, y2) = kp2[img2_idx].pt
             list_kp2.append([x2, y2])
-        
-##        #Get average coordinates.
-##        if list_kp2:
-##            xx, yy = zip(*list_kp2)
-##            avg_x = sum(xx)/len(xx)
-##            avg_y = sum(yy)/len(yy)
-##
-##            temp_kp2 = copy.deepcopy(list_kp2)
-##
-##
-##            #Remove vertecies if they are too far away - possibly false positives.
-##            for vertex in temp_kp2:
-##                if vertex[0] > (avg_x + self.thresh) or vertex[0] < (avg_x - self.thresh):
-##                    list_kp2.remove(vertex)
-##                elif vertex[1] > (avg_y + self.thresh) or vertex[1] < (avg_y - self.thresh):
-##                    list_kp2.remove(vertex)
-##                    
-##            
+ 
         #Update positions after vertecies are removed.
         pos = self.getContours(frame, list_kp2)
                 
@@ -72,11 +55,8 @@ class FiducialTrack:
             for vertex in list_kp2:
                 vertex = tuple((int(vertex[0]), int(vertex[1])))
                 cv2.rectangle(frame, vertex, vertex, (255,0,0), self.dot_width)
-
-                    
-            return pos
-        else:
-            return []
+                
+        return pos
     
     def getContours(self, frame, list_kp2):
         #Making a copy of frame to make rectangles and stuff on.
@@ -86,13 +66,9 @@ class FiducialTrack:
         for vertex in list_kp2:
             vertex = tuple((int(vertex[0]), int(vertex[1])))
             cv2.rectangle(im1, vertex, vertex, (255,0,0), self.dot_width)
-
-        #DELETE THIS.
-        cv2.imshow('Good stuff' , im1)
         
         #Creates mask (Binary image where only the blue dots (representing matches) is white and rest black.      
         mask = cv2.inRange(im1, (255,0,0), (255,0,0))
-        
 
         #Gets contours from mask
         im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -128,7 +104,10 @@ class FiducialTrack:
                # cv2.drawContours(frame, contours, -1, (0,0,255) , 3)
 
         #Shows mask
-        cv2.imshow("test", mask)
+        if self.drawing_matches:
+            cv2.imshow("test", mask)
+            cv2.imshow('Good stuff' , im1)
+            
         return areas
             
 
