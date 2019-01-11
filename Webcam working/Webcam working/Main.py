@@ -10,16 +10,16 @@ class Main:
         self.cap = cv2.VideoCapture(0)
 
         ##Tracker for pixel change
-        ##self.tracker = Tracker.Tracker(False)
+        self.tracker = Tracker.Tracker(False)
 
         ##Tracker for ColorTracking
-        ##self.tracker = ColourTrack.ColorTracker(False, 60)
+        #self.tracker = ColourTrack.ColorTracker(False, 60)
 
         ##Tracker for fiducials
-        self.tracker = FiducialTrack.FiducialTrack(True, "fid4.png", (0,255,0))
-        self.tracker2 = FiducialTrack.FiducialTrack(True, "fid1.png", (0,0,255))
+        #self.tracker = FiducialTrack.FiducialTrack(False, "fid4.png", (0,255,0))
+        #self.tracker2 = FiducialTrack.FiducialTrack(False, "fid1.png", (0,0,255))
 
-        self.fiducials_activated = True
+        self.fiducials_activated = False
         self.score = 0
 
         ##Initializes a list of Rectangle objects from the Rect class.

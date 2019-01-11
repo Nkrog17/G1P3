@@ -19,21 +19,26 @@ class FiducialTrack:
         #ORB keypoint detector initialized.
         orb = cv2.ORB_create()
 
+        #Find feature keypoints on both fiducial and webcam frame.
         kp1, des1 = orb.detectAndCompute(img1,None)
         kp2, des2 = orb.detectAndCompute(img2,None)
 
+        #Unknown values...
         index_params = dict(algorithm = 6,
                    table_number = 6,
                    key_size = 12,
                    multi_probe_level = 1)
         search_params = dict(checks=50)
 
+        #Flann is a mathcer - it compares keypoints and assess whether or not they are matches.
         flann = cv2.FlannBasedMatcher(index_params,search_params)
 
         try:
+            #Create matches with Flann and sort them after quality. (distance)
             matches = flann.knnMatch(des1,des2,k=2)
             matches = sorted(matches, key = lambda x : x[1].distance)
 
+            #Give 40 matches to track_fiducial 
             return self.track_fiducial(frame, matches[:self.matches], kp1, kp2)
         except:
             return []
